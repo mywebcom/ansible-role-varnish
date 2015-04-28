@@ -1,0 +1,35 @@
+- name: copy varnish init.d script centos
+  copy: src=init.d-varnish-centos dest=/etc/init.d/varnish owner=root group=root mode=0755
+  when: ansible_os_family == "CentOs"
+  
+- name: copy varnish init.d script ubuntu
+  copy: src=init.d-varnish-ubuntu dest=/etc/init.d/varnish owner=root group=root mode=0755
+  when: ansible_os_family == "Ubuntu"  
+  
+- name: create sysconfig directory
+  file: path=/etc/sysconfig/ owner=root group=root mode=0644 state=directory
+
+- name: copy sysconfig varnish 
+  template: src=sysconfig-varnish.conf dest=/etc/sysconfig/varnish owner=root group=root mode=0644
+
+- name: Add group "varnish"
+  group: name=varnish
+
+- name: Add user "varnish"
+  user: name=varnish group=varnish state=present
+ 
+- name: create directory
+  file: path={{varnish_vcl_file | dirname}} owner=varnish group=varnish mode=0644 state=directory
+ 
+- name: add default vcl
+  template: src=varnish.vcl dest={{varnish_vcl_file}} owner=varnish group=varnish mode=0644
+
+- name: add varnish into autostart
+  service: name=varnish enabled=yes state=started
+    
+- name: copy link shell script
+  copy: src=varnish-create-link.sh dest=/root/
+
+- name: link varnish exec
+  shell: /bin/sh /root/varnish-create-link.sh
+  notify: restart varnish

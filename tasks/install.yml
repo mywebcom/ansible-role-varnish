@@ -1,0 +1,36 @@
+---
+- name: prepare varnish 
+  apt: name={{ item }} state=present
+  with_items: 
+     - autotools-dev
+     - automake1.9
+     - libtool
+     - autoconf
+     - libncurses-dev
+     - xsltproc
+     - groff-base
+     - libpcre3-dev
+     - pkg-config
+     - libreadline-dev 
+  when: ansible_os_family == "Ubuntu"
+     
+- name: prepare varnish 
+  yum: name={{ item }} state=present
+  with_items: 
+     - pcre-devel
+     - gcc
+     - automake
+     - autoconf
+     - libtool
+     - ncurses-devel
+     - libxslt
+     - groff
+     - pcre-devel
+     - pkgconfig
+  when: ansible_os_family == "CentOs"
+  
+- name: copy varnish-install shell script
+  copy: src=varnish-install.sh dest=/root/
+
+- name: install varnish
+  shell: /bin/sh /root/varnish-install.sh {{varnish_version}}

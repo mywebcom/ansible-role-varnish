@@ -1,0 +1,29 @@
+---
+- name: install geoip dependency
+  apt: name={{item}} state=present
+  with_items:
+    - python-docutils
+    - geoip-bin 
+    - geoip-database
+    - libgeoip-dev
+
+- name: download varnish source again
+  get_url: url=http://repo.varnish-cache.org/source/varnish-{{varnish_version}}.tar.gz
+           dest=/tmp/varnish-{{ varnish_version }}.tar.gz
+
+- name: extract varnish tar ball
+  shell: tar -xzvf /tmp/varnish-{{ varnish_version }}.tar.gz -C /tmp/
+         creates=/tmp/varnish-{{ varnish_version }}
+         
+- name: remove arnish tar ball
+  file: path=/tmp/varnish-{{ varnish_version }}.tar.gz state=absent
+  
+- name: build varnish
+  shell: cd /tmp/varnish-{{ varnish_version }}; ./autogen.sh; ./configure --prefix=/usr/local/varnish; make   
+         
+- name: get geoip vmod
+  git: repo=https://github.com/lampeh/libvmod-geoip.git dest=/tmp/geoipmod accept_hostkey=yes  
+  
+- name: install geoip mod
+  shell: cd /tmp/geoipmod; ./autogen.sh; ./configure VARNISHSRC=/tmp/varnish-{{ varnish_version }} VMODDIR=/usr/local/lib/varnish/vmods;make;make install
+  register: restart varnish

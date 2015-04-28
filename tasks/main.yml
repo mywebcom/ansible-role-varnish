@@ -1,0 +1,12 @@
+---
+- name: check if varnish has been installed
+  stat: path=/var/run/varnish.pid
+  register: varnishd
+
+- include: install.yml
+  when: varnishd.stat.exists == false
+
+- include: server.yml
+
+- include: geoip.yml
+  when: varnish_geoip_enabled
