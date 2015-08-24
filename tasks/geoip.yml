@@ -25,5 +25,5 @@
   git: repo=https://github.com/lampeh/libvmod-geoip.git dest=/tmp/geoipmod accept_hostkey=yes  
   
 - name: install geoip mod
-  shell: cd /tmp/geoipmod; ./autogen.sh; ./configure VARNISHSRC=/tmp/varnish-{{ varnish_version }} VMODDIR=/usr/local/lib/varnish/vmods;make;make install
+  shell: cd /tmp/geoipmod; ./autogen.sh; ./configure VARNISHSRC=/tmp/varnish-{{ varnish_version }} VMODDIR=/usr/local/varnish/lib/varnish/vmods/;make;make install
   register: restart varnish

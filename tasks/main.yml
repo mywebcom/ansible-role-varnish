@@ -1,6 +1,6 @@
 ---
 - name: check if varnish has been installed
-  stat: path=/var/run/varnish.pid
+  stat: path=/var/run/varnishd.pid
   register: varnishd
 
 - include: install.yml
